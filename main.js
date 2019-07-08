@@ -63,7 +63,12 @@ const printCurrentCard = () => {
   let card = data.cards.find( 
     e => e.brand === currentCard
   )
-  console.log(card)
+  let title = document.createElement('h3')
+  let date = document.createElement('em')
+  title.innerText = card.brand
+  date.innerText = card.expirationDate
+  container.appendChild(title)
+  container.appendChild(date)
 }
 
 const changeCard = () => {
