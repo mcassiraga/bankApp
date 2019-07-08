@@ -1,7 +1,13 @@
 /*
 - EL usuario debe poder visualizar su informacion personal y los datos de sus tarjetas de crédito, mostrando una a la vez y permitiendole cambiar entre ellas
+
 - para cada tarjeta se debe mostrar la fecha de vencimiento, la deduda en cada moneda existente y ofrecer el pago en una moneda elejida segun las cuentas de la persona.
-- la persona debe poder elegir una opcion de monto a pagar entre total, minimo y otro. en caso de no hacer le pago total hay que mostrar el saldo restante.
+  - Si la persona tiene cuenta en pesos se le debe ofrecer pagar toda su deuda en esa moneda, convirtiendo el valor el valor de     cualquier deuda en otra moneda a pesos y sumandolo al total a pagar.
+  - Si la persona tiene cuenta en dolares hay que hace lo mismo en el punto anterior pero convirtiendo todo a dolares. 
+
+- la persona debe poder elegir una opcion de monto a pagar entre total o pago minimo (tiene pago minimo). en caso de hacer el pago minimo hay que mostrar el saldo restante.
+
+tip: las opcionnes de moneda a pagar y monto de pago podrian mostrarse como selectes independientes en los que le sumamos diferentes options segun las condiciones y las opciones conn las que el usuario pueda contar. 
 */
 
 let data = {
