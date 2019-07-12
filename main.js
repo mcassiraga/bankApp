@@ -48,7 +48,6 @@ const initialize = () => {
 }
 
 const printInitialData = () => {
-  console.log(currentCard)
   let h1 = document.getElementById('greet')
   let select = document.getElementById('selectCard')
   select.innerHTML = ''
@@ -58,7 +57,7 @@ const printInitialData = () => {
     let option = document.createElement('option')
     option.innerText = card.brand
     option.value = card.brand
-    option.selected = card.brand === currentCard ? true : false 
+    option.selected = card.brand === currentCard
     select.appendChild(option)
   })
 }
@@ -69,12 +68,39 @@ const printCurrentCard = () => {
   let card = data.cards.find( 
     e => e.brand === currentCard
   )
-  let title = document.createElement('h3')
   let date = document.createElement('em')
-  title.innerText = card.brand
+  let pesosDebt = document.createElement('p')
+  let dollarsDebt = document.createElement('p')
+
+  pesosDebt.innerText = `Pesos: ${card.pesosDebt}`
+  dollarsDebt.innerText = `Dólares: ${card.dollarsDebt}`
   date.innerText = card.expirationDate
-  container.appendChild(title)
+
   container.appendChild(date)
+  container.appendChild(pesosDebt)
+  container.appendChild(dollarsDebt)
+  container.appendChild(selectPaymentCurrency(card))
+}
+
+const selectPaymentCurrency = ({pesosDebt, dollarsDebt}) =>{
+  //let {pesosDebt, dollarsDebt} = card
+
+  let selector = document.createElement('select')
+  if( data.hasPesosAccount && pesosDebt){
+    let pesos = document.createElement('option')
+    pesos.innerText = 'Pagar en pesos'
+    pesos.value = 'pesos'
+    selector.appendChild(pesos)
+  }
+
+  if(data.hasDollarsAccount && dollarsDebt){
+    let dollars = document.createElement('option')
+    dollars.innerText = 'Pagar en dolares'
+    dollars.value = 'dollars'
+    selector.appendChild(dollars)
+  }
+
+  return selector
 }
 
 const changeCard = () => {
