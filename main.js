@@ -1,15 +1,3 @@
-/*
-- EL usuario debe poder visualizar su informacion personal y los datos de sus tarjetas de crédito, mostrando una a la vez y permitiendole cambiar entre ellas
-
-- para cada tarjeta se debe mostrar la fecha de vencimiento, la deduda en cada moneda existente y ofrecer el pago en una moneda elejida segun las cuentas de la persona.
-  - Si la persona tiene cuenta en pesos se le debe ofrecer pagar toda su deuda en esa moneda, convirtiendo el valor el valor de     cualquier deuda en otra moneda a pesos y sumandolo al total a pagar.
-  - Si la persona tiene cuenta en dolares hay que hace lo mismo en el punto anterior pero convirtiendo todo a dolares. 
-
-- la persona debe poder elegir una opcion de monto a pagar entre total o pago minimo (tiene pago minimo). en caso de hacer el pago minimo hay que mostrar el saldo restante.
-
-tip: las opcionnes de moneda a pagar y monto de pago podrian mostrarse como selectes independientes en los que le sumamos diferentes options segun las condiciones y las opciones conn las que el usuario pueda contar. 
-*/
-
 let data = {
   user: 'Calixta Ochoa',
   hasPesosAccount: true,
@@ -39,7 +27,7 @@ let data = {
   dollarExchange: 43.50
 }
 
-let currentCard = data.cards[0].brand
+let currentCard = data.cards[0].brand // tarjeta por defecto
 
 const initialize = () => {
   printInitialData()
@@ -87,53 +75,70 @@ const changeCard = () => {
   initialize()
 }
 
-const fillModal = () => {
-  // 1. capturar qué tarjeta está seleccionada
-  let selectCard = document.getElementById('selectCard')
-  let currentCard = selectCard.value
+const changeCurrency = () => {
+  let currencySelector = document.getElementById('currencySelector')
+  currencySelector.value = event.target.value
+  fillAmountSelector() // recarga las opciones disponibles en el selector de monto al cambiar la moneda
+}
+
+const fillCurrencySelector = () => {
   let card = data.cards.find(e => e.brand === currentCard)
-  let {pesosDebt, dollarsDebt, minimumPayment} = card // extraigo las propiedades del objeto que me interesan
-  
-  // 2. localizar selectores
+  let {pesosDebt, dollarsDebt} = card // extraigo las propiedades del objeto que me interesan
   let currencySelector = document.getElementById('currencySelector')
   currencySelector.innerHTML = ''
-  let amountSelector = document.getElementById('amountSelector')
-  amountSelector.innerHTML = ''
 
-  // 3. options de los selects
   if (pesosDebt) {
-    let pesosOption = document.createElement('option')
-    pesosOption.innerText = 'Pagar en pesos'
-    pesosOption.value = 'Pesos'
-    currencySelector.appendChild(pesosOption)
-
-    let amountPesosOption = document.createElement('option')
-    amountPesosOption.innerText = `Total (ARS ${pesosDebt})`
-    amountPesosOption.value = pesosDebt
-    amountSelector.appendChild(amountPesosOption)
-
-    let minimumPesos = document.createElement('option')
-    minimumPesos.innerText = `Mínimo (ARS ${minimumPayment})`
-    minimumPesos.value = minimumPayment
-    amountSelector.appendChild(minimumPesos)
+      let pesosOption = document.createElement('option')
+      pesosOption.innerText = 'Pagar en pesos'
+      pesosOption.value = 'Pesos'
+      currencySelector.appendChild(pesosOption)
   }
 
   if (dollarsDebt) {
-    let dollarOption = document.createElement('option')
-    dollarOption.innerText = 'Pagar en dólares'
-    dollarOption.value = 'Dólares'
-    currencySelector.appendChild(dollarOption)
-
-    let amountDollarOption = document.createElement('option')
-    amountDollarOption.innerText = `Total (USD ${dollarsDebt})`
-    amountDollarOption.value = dollarsDebt
-    amountSelector.appendChild(amountDollarOption)
-
-    let minimumDollars = document.createElement('option')
-    minimumDollars.innerText = `Mínimo (ARS ${minimumPayment})`
-    minimumDollars.value = Math.round(minimumPayment / data.dollarExchange)
-    amountSelector.appendChild(minimumDollars)
+      let dollarOption = document.createElement('option')
+      dollarOption.innerText = 'Pagar en dólares'
+      dollarOption.value = 'Dólares'
+      currencySelector.appendChild(dollarOption)
   }
+}
+
+const fillAmountSelector = () => {
+  let card = data.cards.find(e => e.brand === currentCard)
+  let {pesosDebt, dollarsDebt, minimumPayment} = card // extraigo las propiedades del objeto que me interesan
+  let totalDebtinPesos = pesosDebt + (dollarsDebt * data.dollarExchange)
+  let totalDebtinDollars = Math.round(totalDebtinPesos / data.dollarExchange)
+  let amountSelector = document.getElementById('amountSelector')
+  amountSelector.innerHTML = ''
+  let currencySelector = document.getElementById('currencySelector')
+
+  if (currencySelector.value === 'Pesos') {  
+      let amountPesosOption = document.createElement('option')
+      amountPesosOption.innerText = dollarsDebt ? `Total (ARS ${totalDebtinPesos})` : `Total (ARS ${pesosDebt})`
+      amountPesosOption.value = dollarsDebt ? totalDebtinPesos : pesosDebt
+      amountSelector.appendChild(amountPesosOption)
+  
+      let minimumPesos = document.createElement('option')
+      minimumPesos.innerText = `Mínimo (ARS ${minimumPayment})`
+      minimumPesos.value = minimumPayment
+      amountSelector.appendChild(minimumPesos)
+    }
+
+  if (currencySelector.value === 'Dólares') {  
+      let amountDollarOption = document.createElement('option')
+      amountDollarOption.innerText = pesosDebt ? `Total (USD ${totalDebtinDollars})` : `Total (USD ${dollarsDebt})`
+      amountDollarOption.value = pesosDebt ? totalDebtinDollars : dollarsDebt
+      amountSelector.appendChild(amountDollarOption)
+  
+      let minimumDollars = document.createElement('option')
+      minimumDollars.innerText = `Mínimo (USD ${Math.round(minimumPayment / data.dollarExchange)})`
+      minimumDollars.value = Math.round(minimumPayment / data.dollarExchange)
+      amountSelector.appendChild(minimumDollars)
+    }
+}
+
+const fillModal = () => {
+  fillCurrencySelector()
+  fillAmountSelector()
 
   let payButton = document.getElementById('payButton')
   payButton.disabled = false
@@ -142,12 +147,16 @@ const fillModal = () => {
 const payDebt = () => {
   let amountSelector = document.getElementById('amountSelector')
   let amountPaid = amountSelector.value
-  let find = data.cards.find(e => e.brand === currentCard)
-  let totalDebt = currencySelector.value === 'Pesos' ? find.pesosDebt : find.dollarsDebt
-  let currency = currencySelector.value === 'Pesos' ? 'ARS' : 'USD'
+  
+  let card = data.cards.find(e => e.brand === currentCard)
+  let {pesosDebt, dollarsDebt} = card
+  let totalDebtinPesos = pesosDebt + (dollarsDebt * data.dollarExchange)
+  let totalDebtinDollars = Math.round(totalDebtinPesos / data.dollarExchange)
+  let totalDebt = currencySelector.value === 'Pesos' ? totalDebtinPesos : totalDebtinDollars
+  let currencySymbol = currencySelector.value === 'Pesos' ? 'ARS' : 'USD'
 
   let infoSaldo = document.createElement('p')
-  infoSaldo.innerText = `Pagó ${currency} ${amountPaid}. Su nuevo saldo es de ${currency} ${totalDebt - amountPaid}.`
+  infoSaldo.innerText = `Pagó ${currencySymbol} ${amountPaid}. Su nuevo saldo es de ${currencySymbol} ${totalDebt - amountPaid}.`
   let accountSummary = document.getElementById('account-summary')
   accountSummary.appendChild(infoSaldo)
 
