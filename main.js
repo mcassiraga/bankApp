@@ -168,8 +168,3 @@ const clearModal = () => {
   let accountSummary = document.getElementById('account-summary')
   accountSummary.innerHTML = ''
 }
-
-const refreshData = () => {
-
-  initialize()
-}
