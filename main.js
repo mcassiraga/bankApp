@@ -147,16 +147,16 @@ const fillModal = () => {
 const payDebt = () => {
   let amountSelector = document.getElementById('amountSelector')
   let amountPaid = amountSelector.value
-  
+
   let card = data.cards.find(e => e.brand === currentCard)
   let {pesosDebt, dollarsDebt} = card
   let totalDebtinPesos = pesosDebt + (dollarsDebt * data.dollarExchange)
-  let totalDebtinDollars = Math.round(totalDebtinPesos / data.dollarExchange)
+  let totalDebtinDollars = totalDebtinPesos / data.dollarExchange
   let totalDebt = currencySelector.value === 'Pesos' ? totalDebtinPesos : totalDebtinDollars
   let currencySymbol = currencySelector.value === 'Pesos' ? 'ARS' : 'USD'
 
   let infoSaldo = document.createElement('p')
-  infoSaldo.innerText = `Pagó ${currencySymbol} ${amountPaid}. Su nuevo saldo es de ${currencySymbol} ${totalDebt - amountPaid}.`
+  infoSaldo.innerText = `Pagó ${currencySymbol} ${amountPaid}. Su nuevo saldo es de ${currencySymbol} ${Math.round(totalDebt - amountPaid)}.`
   let accountSummary = document.getElementById('account-summary')
   accountSummary.appendChild(infoSaldo)
 
@@ -167,4 +167,9 @@ const payDebt = () => {
 const clearModal = () => {
   let accountSummary = document.getElementById('account-summary')
   accountSummary.innerHTML = ''
+}
+
+const refreshData = () => {
+
+  initialize()
 }
